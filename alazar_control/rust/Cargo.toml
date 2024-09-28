@@ -1,0 +1,11 @@
+[package]
+name = "rust_lib_alazar_control"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "staticlib"]
+
+[dependencies]
+anyhow = "1.0.89"
+flutter_rust_bridge = "=2.4.0"
