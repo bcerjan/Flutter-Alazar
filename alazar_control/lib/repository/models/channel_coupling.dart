@@ -9,4 +9,13 @@ enum ChannelCoupling {
 
   const ChannelCoupling(this.label);
   final String label;
+
+  int toRust() {
+    switch (this) {
+      case ac:
+        return 1;
+      case dc:
+        return 2;
+    }
+  }
 }

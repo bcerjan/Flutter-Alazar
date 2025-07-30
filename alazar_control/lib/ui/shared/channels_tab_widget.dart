@@ -37,7 +37,7 @@ class ChannelsTabWidget extends StatelessWidget {
             TextButton(
                 onPressed: () => context
                     .read<ExperimentBloc>()
-                    .add(ExperimentDetectBoards()),
+                    .add(ExperimentDetectBoardsEvent()),
                 child: const Text('Try To Detect Boards'))
           ],
         ));

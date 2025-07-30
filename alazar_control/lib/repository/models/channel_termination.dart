@@ -9,4 +9,13 @@ enum ChannelTermination {
 
   const ChannelTermination(this.label);
   final String label;
+
+  int toRust() {
+    switch (this) {
+      case ChannelTermination.ohm50:
+        return 2;
+      case ChannelTermination.ohm1M:
+        return 1;
+    }
+  }
 }

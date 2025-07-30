@@ -15,4 +15,6 @@ class ExperimentStartStopEvent extends ExperimentEvent {
   final bool live;
 }
 
-class ExperimentDetectBoards extends ExperimentEvent {}
+class ExperimentDetectBoardsEvent extends ExperimentEvent {}
+
+class ExperimentClearErrorEvent extends ExperimentEvent {}

@@ -3,6 +3,8 @@
 
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
+import 'api/configure_board.dart';
+import 'api/control_ramp_box.dart';
 import 'api/simple.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -68,7 +70,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.4.0';
 
   @override
-  int get rustContentHash => -1127615089;
+  int get rustContentHash => -1092055412;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -79,11 +81,18 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 }
 
 abstract class RustLibApi extends BaseApi {
-  Future<int> crateApiSimpleCreateAlazarStream();
+  Stream<RustAlazarResponse> crateApiSimpleCreateAlazarStream();
 
   Future<List<RustBoard>> crateApiSimpleDetectBoardsRust();
 
   Future<void> crateApiSimpleInitApp();
+
+  Future<String> crateApiSimplePanicTest();
+
+  Stream<RustAlazarResponse> crateApiSimpleStartAcquisition(
+      {required RustAlazarSettings settings,
+      required RustRampBox rampBoxSettings,
+      required List<RustBoard> boards});
 }
 
 class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
@@ -95,27 +104,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   });
 
   @override
-  Future<int> crateApiSimpleCreateAlazarStream() {
-    return handler.executeNormal(NormalTask(
+  Stream<RustAlazarResponse> crateApiSimpleCreateAlazarStream() {
+    final sink = RustStreamSink<RustAlazarResponse>();
+    unawaited(handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_StreamSink_rust_alazar_response_Sse(sink, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 1, port: port_);
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_i_32,
-        decodeErrorData: null,
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_AnyhowException,
       ),
       constMeta: kCrateApiSimpleCreateAlazarStreamConstMeta,
-      argValues: [],
+      argValues: [sink],
       apiImpl: this,
-    ));
+    )));
+    return sink.stream;
   }
 
   TaskConstMeta get kCrateApiSimpleCreateAlazarStreamConstMeta =>
       const TaskConstMeta(
         debugName: "create_alazar_stream",
-        argNames: [],
+        argNames: ["sink"],
       );
 
   @override
@@ -165,10 +177,127 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         argNames: [],
       );
 
+  @override
+  Future<String> crateApiSimplePanicTest() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 4, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiSimplePanicTestConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiSimplePanicTestConstMeta => const TaskConstMeta(
+        debugName: "panic_test",
+        argNames: [],
+      );
+
+  @override
+  Stream<RustAlazarResponse> crateApiSimpleStartAcquisition(
+      {required RustAlazarSettings settings,
+      required RustRampBox rampBoxSettings,
+      required List<RustBoard> boards}) {
+    final sink = RustStreamSink<RustAlazarResponse>();
+    unawaited(handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_box_autoadd_rust_alazar_settings(settings, serializer);
+        sse_encode_box_autoadd_rust_ramp_box(rampBoxSettings, serializer);
+        sse_encode_list_rust_board(boards, serializer);
+        sse_encode_StreamSink_rust_alazar_response_Sse(sink, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 5, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiSimpleStartAcquisitionConstMeta,
+      argValues: [settings, rampBoxSettings, boards, sink],
+      apiImpl: this,
+    )));
+    return sink.stream;
+  }
+
+  TaskConstMeta get kCrateApiSimpleStartAcquisitionConstMeta =>
+      const TaskConstMeta(
+        debugName: "startAcquisition",
+        argNames: ["settings", "rampBoxSettings", "boards", "sink"],
+      );
+
+  @protected
+  AnyhowException dco_decode_AnyhowException(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return AnyhowException(raw as String);
+  }
+
+  @protected
+  RustStreamSink<RustAlazarResponse>
+      dco_decode_StreamSink_rust_alazar_response_Sse(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    throw UnimplementedError();
+  }
+
+  @protected
+  String dco_decode_String(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as String;
+  }
+
+  @protected
+  bool dco_decode_bool(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as bool;
+  }
+
+  @protected
+  RustAlazarSettings dco_decode_box_autoadd_rust_alazar_settings(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_rust_alazar_settings(raw);
+  }
+
+  @protected
+  RustRampBox dco_decode_box_autoadd_rust_ramp_box(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_rust_ramp_box(raw);
+  }
+
+  @protected
+  double dco_decode_f_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as double;
+  }
+
   @protected
   int dco_decode_i_32(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as int;
+  }
+
+  @protected
+  List<List<RustChannel>> dco_decode_list_list_rust_channel(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_list_rust_channel).toList();
+  }
+
+  @protected
+  Int32List dco_decode_list_prim_i_32_strict(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as Int32List;
+  }
+
+  @protected
+  Uint8List dco_decode_list_prim_u_8_strict(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as Uint8List;
   }
 
   @protected
@@ -184,15 +313,57 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  RustBoard dco_decode_rust_board(dynamic raw) {
+  RustAlazarResponse dco_decode_rust_alazar_response(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 3)
       throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return RustAlazarResponse(
+      msg: dco_decode_String(arr[0]),
+      running: dco_decode_bool(arr[1]),
+      imageData: dco_decode_list_prim_i_32_strict(arr[2]),
+    );
+  }
+
+  @protected
+  RustAlazarSettings dco_decode_rust_alazar_settings(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 18)
+      throw Exception('unexpected arr length: expect 18 but see ${arr.length}');
+    return RustAlazarSettings(
+      laserRepRateMHz: dco_decode_u_32(arr[0]),
+      numBuffers: dco_decode_u_32(arr[1]),
+      preTriggerSamples: dco_decode_i_32(arr[2]),
+      postTriggerSamples: dco_decode_i_32(arr[3]),
+      samplesPerRecord: dco_decode_u_32(arr[4]),
+      bytesPerBuffer: dco_decode_u_32(arr[5]),
+      recordsPerAcquisition: dco_decode_i_32(arr[6]),
+      recordsPerBuffer: dco_decode_i_32(arr[7]),
+      live: dco_decode_bool(arr[8]),
+      rampBoxAttached: dco_decode_bool(arr[9]),
+      trigger: dco_decode_rust_trigger_type(arr[10]),
+      triggerLevel: dco_decode_u_32(arr[11]),
+      triggerDelaySec: dco_decode_f_64(arr[12]),
+      triggerTimeoutSec: dco_decode_f_64(arr[13]),
+      sampleRate: dco_decode_u_32(arr[14]),
+      decimantionFactor: dco_decode_u_32(arr[15]),
+      channels: dco_decode_list_list_rust_channel(arr[16]),
+      admaFlags: dco_decode_i_32(arr[17]),
+    );
+  }
+
+  @protected
+  RustBoard dco_decode_rust_board(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
     return RustBoard(
       index: dco_decode_i_32(arr[0]),
       cardType: dco_decode_rust_card_type(arr[1]),
       channels: dco_decode_list_rust_channel(arr[2]),
+      bytesPerSample: dco_decode_u_32(arr[3]),
     );
   }
 
@@ -206,11 +377,60 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   RustChannel dco_decode_rust_channel(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 1)
-      throw Exception('unexpected arr length: expect 1 but see ${arr.length}');
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
     return RustChannel(
       index: dco_decode_i_32(arr[0]),
+      enabled: dco_decode_bool(arr[1]),
+      coupling: dco_decode_i_32(arr[2]),
+      termination: dco_decode_i_32(arr[3]),
+      range: dco_decode_i_32(arr[4]),
     );
+  }
+
+  @protected
+  RustRampBox dco_decode_rust_ramp_box(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 11)
+      throw Exception('unexpected arr length: expect 11 but see ${arr.length}');
+    return RustRampBox(
+      comPort: dco_decode_String(arr[0]),
+      enableMode: dco_decode_u_8(arr[1]),
+      enablePolarity: dco_decode_u_8(arr[2]),
+      fastDacMode: dco_decode_u_8(arr[3]),
+      fastDacSteps: dco_decode_u_8(arr[4]),
+      fastDacPhase: dco_decode_u_8(arr[5]),
+      fastDacScans: dco_decode_u_8(arr[6]),
+      slowDacMode: dco_decode_u_8(arr[7]),
+      slowDacSteps: dco_decode_u_8(arr[8]),
+      slowDacScans: dco_decode_u_8(arr[9]),
+      boxType: dco_decode_rust_ramp_box_type(arr[10]),
+    );
+  }
+
+  @protected
+  RustRampBoxType dco_decode_rust_ramp_box_type(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return RustRampBoxType.values[raw as int];
+  }
+
+  @protected
+  RustTriggerType dco_decode_rust_trigger_type(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return RustTriggerType.values[raw as int];
+  }
+
+  @protected
+  int dco_decode_u_32(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as int;
+  }
+
+  @protected
+  int dco_decode_u_8(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as int;
   }
 
   @protected
@@ -220,9 +440,84 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_String(deserializer);
+    return AnyhowException(inner);
+  }
+
+  @protected
+  RustStreamSink<RustAlazarResponse>
+      sse_decode_StreamSink_rust_alazar_response_Sse(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    throw UnimplementedError('Unreachable ()');
+  }
+
+  @protected
+  String sse_decode_String(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_list_prim_u_8_strict(deserializer);
+    return utf8.decoder.convert(inner);
+  }
+
+  @protected
+  bool sse_decode_bool(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getUint8() != 0;
+  }
+
+  @protected
+  RustAlazarSettings sse_decode_box_autoadd_rust_alazar_settings(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_rust_alazar_settings(deserializer));
+  }
+
+  @protected
+  RustRampBox sse_decode_box_autoadd_rust_ramp_box(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_rust_ramp_box(deserializer));
+  }
+
+  @protected
+  double sse_decode_f_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getFloat64();
+  }
+
+  @protected
   int sse_decode_i_32(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getInt32();
+  }
+
+  @protected
+  List<List<RustChannel>> sse_decode_list_list_rust_channel(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <List<RustChannel>>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_list_rust_channel(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  Int32List sse_decode_list_prim_i_32_strict(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var len_ = sse_decode_i_32(deserializer);
+    return deserializer.buffer.getInt32List(len_);
+  }
+
+  @protected
+  Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var len_ = sse_decode_i_32(deserializer);
+    return deserializer.buffer.getUint8List(len_);
   }
 
   @protected
@@ -250,13 +545,71 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  RustAlazarResponse sse_decode_rust_alazar_response(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_msg = sse_decode_String(deserializer);
+    var var_running = sse_decode_bool(deserializer);
+    var var_imageData = sse_decode_list_prim_i_32_strict(deserializer);
+    return RustAlazarResponse(
+        msg: var_msg, running: var_running, imageData: var_imageData);
+  }
+
+  @protected
+  RustAlazarSettings sse_decode_rust_alazar_settings(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_laserRepRateMHz = sse_decode_u_32(deserializer);
+    var var_numBuffers = sse_decode_u_32(deserializer);
+    var var_preTriggerSamples = sse_decode_i_32(deserializer);
+    var var_postTriggerSamples = sse_decode_i_32(deserializer);
+    var var_samplesPerRecord = sse_decode_u_32(deserializer);
+    var var_bytesPerBuffer = sse_decode_u_32(deserializer);
+    var var_recordsPerAcquisition = sse_decode_i_32(deserializer);
+    var var_recordsPerBuffer = sse_decode_i_32(deserializer);
+    var var_live = sse_decode_bool(deserializer);
+    var var_rampBoxAttached = sse_decode_bool(deserializer);
+    var var_trigger = sse_decode_rust_trigger_type(deserializer);
+    var var_triggerLevel = sse_decode_u_32(deserializer);
+    var var_triggerDelaySec = sse_decode_f_64(deserializer);
+    var var_triggerTimeoutSec = sse_decode_f_64(deserializer);
+    var var_sampleRate = sse_decode_u_32(deserializer);
+    var var_decimantionFactor = sse_decode_u_32(deserializer);
+    var var_channels = sse_decode_list_list_rust_channel(deserializer);
+    var var_admaFlags = sse_decode_i_32(deserializer);
+    return RustAlazarSettings(
+        laserRepRateMHz: var_laserRepRateMHz,
+        numBuffers: var_numBuffers,
+        preTriggerSamples: var_preTriggerSamples,
+        postTriggerSamples: var_postTriggerSamples,
+        samplesPerRecord: var_samplesPerRecord,
+        bytesPerBuffer: var_bytesPerBuffer,
+        recordsPerAcquisition: var_recordsPerAcquisition,
+        recordsPerBuffer: var_recordsPerBuffer,
+        live: var_live,
+        rampBoxAttached: var_rampBoxAttached,
+        trigger: var_trigger,
+        triggerLevel: var_triggerLevel,
+        triggerDelaySec: var_triggerDelaySec,
+        triggerTimeoutSec: var_triggerTimeoutSec,
+        sampleRate: var_sampleRate,
+        decimantionFactor: var_decimantionFactor,
+        channels: var_channels,
+        admaFlags: var_admaFlags);
+  }
+
+  @protected
   RustBoard sse_decode_rust_board(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_index = sse_decode_i_32(deserializer);
     var var_cardType = sse_decode_rust_card_type(deserializer);
     var var_channels = sse_decode_list_rust_channel(deserializer);
+    var var_bytesPerSample = sse_decode_u_32(deserializer);
     return RustBoard(
-        index: var_index, cardType: var_cardType, channels: var_channels);
+        index: var_index,
+        cardType: var_cardType,
+        channels: var_channels,
+        bytesPerSample: var_bytesPerSample);
   }
 
   @protected
@@ -270,7 +623,70 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   RustChannel sse_decode_rust_channel(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_index = sse_decode_i_32(deserializer);
-    return RustChannel(index: var_index);
+    var var_enabled = sse_decode_bool(deserializer);
+    var var_coupling = sse_decode_i_32(deserializer);
+    var var_termination = sse_decode_i_32(deserializer);
+    var var_range = sse_decode_i_32(deserializer);
+    return RustChannel(
+        index: var_index,
+        enabled: var_enabled,
+        coupling: var_coupling,
+        termination: var_termination,
+        range: var_range);
+  }
+
+  @protected
+  RustRampBox sse_decode_rust_ramp_box(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_comPort = sse_decode_String(deserializer);
+    var var_enableMode = sse_decode_u_8(deserializer);
+    var var_enablePolarity = sse_decode_u_8(deserializer);
+    var var_fastDacMode = sse_decode_u_8(deserializer);
+    var var_fastDacSteps = sse_decode_u_8(deserializer);
+    var var_fastDacPhase = sse_decode_u_8(deserializer);
+    var var_fastDacScans = sse_decode_u_8(deserializer);
+    var var_slowDacMode = sse_decode_u_8(deserializer);
+    var var_slowDacSteps = sse_decode_u_8(deserializer);
+    var var_slowDacScans = sse_decode_u_8(deserializer);
+    var var_boxType = sse_decode_rust_ramp_box_type(deserializer);
+    return RustRampBox(
+        comPort: var_comPort,
+        enableMode: var_enableMode,
+        enablePolarity: var_enablePolarity,
+        fastDacMode: var_fastDacMode,
+        fastDacSteps: var_fastDacSteps,
+        fastDacPhase: var_fastDacPhase,
+        fastDacScans: var_fastDacScans,
+        slowDacMode: var_slowDacMode,
+        slowDacSteps: var_slowDacSteps,
+        slowDacScans: var_slowDacScans,
+        boxType: var_boxType);
+  }
+
+  @protected
+  RustRampBoxType sse_decode_rust_ramp_box_type(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return RustRampBoxType.values[inner];
+  }
+
+  @protected
+  RustTriggerType sse_decode_rust_trigger_type(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return RustTriggerType.values[inner];
+  }
+
+  @protected
+  int sse_decode_u_32(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getUint32();
+  }
+
+  @protected
+  int sse_decode_u_8(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getUint8();
   }
 
   @protected
@@ -279,15 +695,87 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  bool sse_decode_bool(SseDeserializer deserializer) {
+  void sse_encode_AnyhowException(
+      AnyhowException self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return deserializer.buffer.getUint8() != 0;
+    sse_encode_String(self.message, serializer);
+  }
+
+  @protected
+  void sse_encode_StreamSink_rust_alazar_response_Sse(
+      RustStreamSink<RustAlazarResponse> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(
+        self.setupAndSerialize(
+            codec: SseCodec(
+          decodeSuccessData: sse_decode_rust_alazar_response,
+          decodeErrorData: sse_decode_AnyhowException,
+        )),
+        serializer);
+  }
+
+  @protected
+  void sse_encode_String(String self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_prim_u_8_strict(utf8.encoder.convert(self), serializer);
+  }
+
+  @protected
+  void sse_encode_bool(bool self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putUint8(self ? 1 : 0);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_rust_alazar_settings(
+      RustAlazarSettings self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_rust_alazar_settings(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_rust_ramp_box(
+      RustRampBox self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_rust_ramp_box(self, serializer);
+  }
+
+  @protected
+  void sse_encode_f_64(double self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putFloat64(self);
   }
 
   @protected
   void sse_encode_i_32(int self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putInt32(self);
+  }
+
+  @protected
+  void sse_encode_list_list_rust_channel(
+      List<List<RustChannel>> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_list_rust_channel(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_prim_i_32_strict(
+      Int32List self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    serializer.buffer.putInt32List(self);
+  }
+
+  @protected
+  void sse_encode_list_prim_u_8_strict(
+      Uint8List self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    serializer.buffer.putUint8List(self);
   }
 
   @protected
@@ -311,11 +799,45 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_rust_alazar_response(
+      RustAlazarResponse self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.msg, serializer);
+    sse_encode_bool(self.running, serializer);
+    sse_encode_list_prim_i_32_strict(self.imageData, serializer);
+  }
+
+  @protected
+  void sse_encode_rust_alazar_settings(
+      RustAlazarSettings self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_32(self.laserRepRateMHz, serializer);
+    sse_encode_u_32(self.numBuffers, serializer);
+    sse_encode_i_32(self.preTriggerSamples, serializer);
+    sse_encode_i_32(self.postTriggerSamples, serializer);
+    sse_encode_u_32(self.samplesPerRecord, serializer);
+    sse_encode_u_32(self.bytesPerBuffer, serializer);
+    sse_encode_i_32(self.recordsPerAcquisition, serializer);
+    sse_encode_i_32(self.recordsPerBuffer, serializer);
+    sse_encode_bool(self.live, serializer);
+    sse_encode_bool(self.rampBoxAttached, serializer);
+    sse_encode_rust_trigger_type(self.trigger, serializer);
+    sse_encode_u_32(self.triggerLevel, serializer);
+    sse_encode_f_64(self.triggerDelaySec, serializer);
+    sse_encode_f_64(self.triggerTimeoutSec, serializer);
+    sse_encode_u_32(self.sampleRate, serializer);
+    sse_encode_u_32(self.decimantionFactor, serializer);
+    sse_encode_list_list_rust_channel(self.channels, serializer);
+    sse_encode_i_32(self.admaFlags, serializer);
+  }
+
+  @protected
   void sse_encode_rust_board(RustBoard self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.index, serializer);
     sse_encode_rust_card_type(self.cardType, serializer);
     sse_encode_list_rust_channel(self.channels, serializer);
+    sse_encode_u_32(self.bytesPerSample, serializer);
   }
 
   @protected
@@ -328,16 +850,56 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_rust_channel(RustChannel self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.index, serializer);
+    sse_encode_bool(self.enabled, serializer);
+    sse_encode_i_32(self.coupling, serializer);
+    sse_encode_i_32(self.termination, serializer);
+    sse_encode_i_32(self.range, serializer);
+  }
+
+  @protected
+  void sse_encode_rust_ramp_box(RustRampBox self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.comPort, serializer);
+    sse_encode_u_8(self.enableMode, serializer);
+    sse_encode_u_8(self.enablePolarity, serializer);
+    sse_encode_u_8(self.fastDacMode, serializer);
+    sse_encode_u_8(self.fastDacSteps, serializer);
+    sse_encode_u_8(self.fastDacPhase, serializer);
+    sse_encode_u_8(self.fastDacScans, serializer);
+    sse_encode_u_8(self.slowDacMode, serializer);
+    sse_encode_u_8(self.slowDacSteps, serializer);
+    sse_encode_u_8(self.slowDacScans, serializer);
+    sse_encode_rust_ramp_box_type(self.boxType, serializer);
+  }
+
+  @protected
+  void sse_encode_rust_ramp_box_type(
+      RustRampBoxType self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
+  void sse_encode_rust_trigger_type(
+      RustTriggerType self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
+  void sse_encode_u_32(int self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putUint32(self);
+  }
+
+  @protected
+  void sse_encode_u_8(int self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putUint8(self);
   }
 
   @protected
   void sse_encode_unit(void self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-  }
-
-  @protected
-  void sse_encode_bool(bool self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    serializer.buffer.putUint8(self ? 1 : 0);
   }
 }

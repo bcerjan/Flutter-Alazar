@@ -17,6 +17,17 @@ class ControlBox with ControlBoxMappable {
     this.fastDacPhase = 0,
     this.fastDacScans = 1,
   });
+
+  const ControlBox.getDefault()
+      : type = ControlBoxType.v2,
+        comPort = '',
+        enableMode = 1,
+        enablePolarity = 1,
+        fastDacMode = 0,
+        slowDacMode = 0,
+        fastDacPhase = 0,
+        fastDacScans = 1;
+
   final ControlBoxType type;
   final String comPort;
   final int enableMode;

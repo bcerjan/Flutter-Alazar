@@ -3,6 +3,8 @@
 
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
+import 'api/configure_board.dart';
+import 'api/control_ramp_box.dart';
 import 'api/simple.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -19,13 +21,50 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   });
 
   @protected
+  AnyhowException dco_decode_AnyhowException(dynamic raw);
+
+  @protected
+  RustStreamSink<RustAlazarResponse>
+      dco_decode_StreamSink_rust_alazar_response_Sse(dynamic raw);
+
+  @protected
+  String dco_decode_String(dynamic raw);
+
+  @protected
+  bool dco_decode_bool(dynamic raw);
+
+  @protected
+  RustAlazarSettings dco_decode_box_autoadd_rust_alazar_settings(dynamic raw);
+
+  @protected
+  RustRampBox dco_decode_box_autoadd_rust_ramp_box(dynamic raw);
+
+  @protected
+  double dco_decode_f_64(dynamic raw);
+
+  @protected
   int dco_decode_i_32(dynamic raw);
+
+  @protected
+  List<List<RustChannel>> dco_decode_list_list_rust_channel(dynamic raw);
+
+  @protected
+  Int32List dco_decode_list_prim_i_32_strict(dynamic raw);
+
+  @protected
+  Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
 
   @protected
   List<RustBoard> dco_decode_list_rust_board(dynamic raw);
 
   @protected
   List<RustChannel> dco_decode_list_rust_channel(dynamic raw);
+
+  @protected
+  RustAlazarResponse dco_decode_rust_alazar_response(dynamic raw);
+
+  @protected
+  RustAlazarSettings dco_decode_rust_alazar_settings(dynamic raw);
 
   @protected
   RustBoard dco_decode_rust_board(dynamic raw);
@@ -37,16 +76,74 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   RustChannel dco_decode_rust_channel(dynamic raw);
 
   @protected
+  RustRampBox dco_decode_rust_ramp_box(dynamic raw);
+
+  @protected
+  RustRampBoxType dco_decode_rust_ramp_box_type(dynamic raw);
+
+  @protected
+  RustTriggerType dco_decode_rust_trigger_type(dynamic raw);
+
+  @protected
+  int dco_decode_u_32(dynamic raw);
+
+  @protected
+  int dco_decode_u_8(dynamic raw);
+
+  @protected
   void dco_decode_unit(dynamic raw);
 
   @protected
+  AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer);
+
+  @protected
+  RustStreamSink<RustAlazarResponse>
+      sse_decode_StreamSink_rust_alazar_response_Sse(
+          SseDeserializer deserializer);
+
+  @protected
+  String sse_decode_String(SseDeserializer deserializer);
+
+  @protected
+  bool sse_decode_bool(SseDeserializer deserializer);
+
+  @protected
+  RustAlazarSettings sse_decode_box_autoadd_rust_alazar_settings(
+      SseDeserializer deserializer);
+
+  @protected
+  RustRampBox sse_decode_box_autoadd_rust_ramp_box(
+      SseDeserializer deserializer);
+
+  @protected
+  double sse_decode_f_64(SseDeserializer deserializer);
+
+  @protected
   int sse_decode_i_32(SseDeserializer deserializer);
+
+  @protected
+  List<List<RustChannel>> sse_decode_list_list_rust_channel(
+      SseDeserializer deserializer);
+
+  @protected
+  Int32List sse_decode_list_prim_i_32_strict(SseDeserializer deserializer);
+
+  @protected
+  Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
 
   @protected
   List<RustBoard> sse_decode_list_rust_board(SseDeserializer deserializer);
 
   @protected
   List<RustChannel> sse_decode_list_rust_channel(SseDeserializer deserializer);
+
+  @protected
+  RustAlazarResponse sse_decode_rust_alazar_response(
+      SseDeserializer deserializer);
+
+  @protected
+  RustAlazarSettings sse_decode_rust_alazar_settings(
+      SseDeserializer deserializer);
 
   @protected
   RustBoard sse_decode_rust_board(SseDeserializer deserializer);
@@ -58,13 +155,62 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   RustChannel sse_decode_rust_channel(SseDeserializer deserializer);
 
   @protected
+  RustRampBox sse_decode_rust_ramp_box(SseDeserializer deserializer);
+
+  @protected
+  RustRampBoxType sse_decode_rust_ramp_box_type(SseDeserializer deserializer);
+
+  @protected
+  RustTriggerType sse_decode_rust_trigger_type(SseDeserializer deserializer);
+
+  @protected
+  int sse_decode_u_32(SseDeserializer deserializer);
+
+  @protected
+  int sse_decode_u_8(SseDeserializer deserializer);
+
+  @protected
   void sse_decode_unit(SseDeserializer deserializer);
 
   @protected
-  bool sse_decode_bool(SseDeserializer deserializer);
+  void sse_encode_AnyhowException(
+      AnyhowException self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_StreamSink_rust_alazar_response_Sse(
+      RustStreamSink<RustAlazarResponse> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_String(String self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_bool(bool self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_rust_alazar_settings(
+      RustAlazarSettings self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_rust_ramp_box(
+      RustRampBox self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_f_64(double self, SseSerializer serializer);
 
   @protected
   void sse_encode_i_32(int self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_list_rust_channel(
+      List<List<RustChannel>> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_prim_i_32_strict(
+      Int32List self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_prim_u_8_strict(
+      Uint8List self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_rust_board(
@@ -73,6 +219,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_rust_channel(
       List<RustChannel> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_rust_alazar_response(
+      RustAlazarResponse self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_rust_alazar_settings(
+      RustAlazarSettings self, SseSerializer serializer);
 
   @protected
   void sse_encode_rust_board(RustBoard self, SseSerializer serializer);
@@ -84,10 +238,24 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_rust_channel(RustChannel self, SseSerializer serializer);
 
   @protected
-  void sse_encode_unit(void self, SseSerializer serializer);
+  void sse_encode_rust_ramp_box(RustRampBox self, SseSerializer serializer);
 
   @protected
-  void sse_encode_bool(bool self, SseSerializer serializer);
+  void sse_encode_rust_ramp_box_type(
+      RustRampBoxType self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_rust_trigger_type(
+      RustTriggerType self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_u_32(int self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_u_8(int self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_unit(void self, SseSerializer serializer);
 }
 
 // Section: wire_class

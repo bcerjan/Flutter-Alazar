@@ -4,29 +4,71 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../frb_generated.dart';
+import 'configure_board.dart';
+import 'control_ramp_box.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These types are ignored because they are not used by any `pub` functions: `RustAlazarResponse`
+// These types are ignored because they are not used by any `pub` functions: `RustMatlabFuncNames`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`
 
-Future<int> createAlazarStream() =>
+Stream<RustAlazarResponse> createAlazarStream() =>
     RustLib.instance.api.crateApiSimpleCreateAlazarStream();
+
+Future<String> panicTest() => RustLib.instance.api.crateApiSimplePanicTest();
 
 Future<List<RustBoard>> detectBoardsRust() =>
     RustLib.instance.api.crateApiSimpleDetectBoardsRust();
+
+Stream<RustAlazarResponse> startAcquisition(
+        {required RustAlazarSettings settings,
+        required RustRampBox rampBoxSettings,
+        required List<RustBoard> boards}) =>
+    RustLib.instance.api.crateApiSimpleStartAcquisition(
+        settings: settings, rampBoxSettings: rampBoxSettings, boards: boards);
+
+class RustAlazarResponse {
+  final String msg;
+  final bool running;
+  final Int32List imageData;
+
+  const RustAlazarResponse({
+    required this.msg,
+    required this.running,
+    required this.imageData,
+  });
+
+  @override
+  int get hashCode => msg.hashCode ^ running.hashCode ^ imageData.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is RustAlazarResponse &&
+          runtimeType == other.runtimeType &&
+          msg == other.msg &&
+          running == other.running &&
+          imageData == other.imageData;
+}
 
 class RustBoard {
   final int index;
   final RustCardType cardType;
   final List<RustChannel> channels;
+  final int bytesPerSample;
 
   const RustBoard({
     required this.index,
     required this.cardType,
     required this.channels,
+    required this.bytesPerSample,
   });
 
   @override
-  int get hashCode => index.hashCode ^ cardType.hashCode ^ channels.hashCode;
+  int get hashCode =>
+      index.hashCode ^
+      cardType.hashCode ^
+      channels.hashCode ^
+      bytesPerSample.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -35,7 +77,8 @@ class RustBoard {
           runtimeType == other.runtimeType &&
           index == other.index &&
           cardType == other.cardType &&
-          channels == other.channels;
+          channels == other.channels &&
+          bytesPerSample == other.bytesPerSample;
 }
 
 enum RustCardType {
@@ -47,18 +90,35 @@ enum RustCardType {
 
 class RustChannel {
   final int index;
+  final bool enabled;
+  final int coupling;
+  final int termination;
+  final int range;
 
   const RustChannel({
     required this.index,
+    required this.enabled,
+    required this.coupling,
+    required this.termination,
+    required this.range,
   });
 
   @override
-  int get hashCode => index.hashCode;
+  int get hashCode =>
+      index.hashCode ^
+      enabled.hashCode ^
+      coupling.hashCode ^
+      termination.hashCode ^
+      range.hashCode;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is RustChannel &&
           runtimeType == other.runtimeType &&
-          index == other.index;
+          index == other.index &&
+          enabled == other.enabled &&
+          coupling == other.coupling &&
+          termination == other.termination &&
+          range == other.range;
 }

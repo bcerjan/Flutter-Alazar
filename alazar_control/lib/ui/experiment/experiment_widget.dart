@@ -13,17 +13,17 @@ class ExperimentWidget extends StatelessWidget {
     return BlocBuilder<ExperimentBloc, ExperimentState>(
         builder: (context, state) {
       if (state.status == ExperimentStatus.error) {
-        showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-                  title: const Text('Error'),
-                  content: Text('Error message: ${state.errorText ?? ''}'),
-                  actions: [
-                    TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text('Got it'))
-                  ],
-                ));
+        // showDialog(
+        //     context: context,
+        //     builder: (context) => AlertDialog(
+        //           title: const Text('Error'),
+        //           content: Text('Error message: ${state.errorText ?? ''}'),
+        //           actions: [
+        //             TextButton(
+        //                 onPressed: () => Navigator.pop(context),
+        //                 child: const Text('Got it'))
+        //           ],
+        //         ));
       }
       switch (state.experiment) {
         case ExperimentGalvoRes():

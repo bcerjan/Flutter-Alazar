@@ -1,4 +1,6 @@
+import 'package:alazar_control/repository/models/alazar_response.dart';
 import 'package:alazar_control/repository/models/all_experiments_enum.dart';
+import 'package:alazar_control/repository/models/control_box.dart';
 import 'package:alazar_control/repository/models/experiment.dart';
 import 'package:alazar_control/repository/repositories/experiment_repository.dart';
 import 'package:dart_mappable/dart_mappable.dart';
@@ -14,7 +16,8 @@ class ExperimentBloc extends HydratedBloc<ExperimentEvent, ExperimentState> {
     on<ExperimentUpdateEvent>(_mapExperimentUpdateEventToState);
     on<ExperimentStartStopEvent>(_mapExperimentStartStopEventToState,
         transformer: sequential()); // process all events in order
-    on<ExperimentDetectBoards>(_mapExperimentDetectBoardsEventToState);
+    on<ExperimentDetectBoardsEvent>(_mapExperimentDetectBoardsEventToState);
+    on<ExperimentClearErrorEvent>(_mapExperimentClearErrorEventToState);
   }
 
   final ExperimentRepository repository;
@@ -49,10 +52,21 @@ class ExperimentBloc extends HydratedBloc<ExperimentEvent, ExperimentState> {
   }
 
   void _mapExperimentStartStopEventToState(
-      ExperimentStartStopEvent event, Emitter<ExperimentState> emit) {}
+      ExperimentStartStopEvent event, Emitter<ExperimentState> emit) {
+    try {
+      // final stream = repository.getAlazarStream();
+      final stream = repository.startAcquisition(state.experiment,
+          state.experiment.controlBox ?? const ControlBox.getDefault());
+      emit(state.addStream(stream: stream));
+    } catch (e, stacktrace) {
+      print(stacktrace);
+      emit(state.copyWith(
+          status: ExperimentStatus.error, errorText: e.toString()));
+    }
+  }
 
   void _mapExperimentDetectBoardsEventToState(
-      ExperimentDetectBoards event, Emitter<ExperimentState> emit) async {
+      ExperimentDetectBoardsEvent event, Emitter<ExperimentState> emit) async {
     try {
       final boards = await repository.detectBoards();
       if (boards.isEmpty) {
@@ -63,10 +77,16 @@ class ExperimentBloc extends HydratedBloc<ExperimentEvent, ExperimentState> {
       }
       final newExp = state.experiment.copyWith.settings(boards: boards);
       emit(state.copyWith(experiment: newExp));
+      // repository.testPanic();
     } catch (e, stacktrace) {
       print(stacktrace);
       emit(state.copyWith(
           status: ExperimentStatus.error, errorText: e.toString()));
     }
+  }
+
+  void _mapExperimentClearErrorEventToState(
+      ExperimentClearErrorEvent event, Emitter<ExperimentState> emit) {
+    emit(state.copyWith(status: ExperimentStatus.idle));
   }
 }

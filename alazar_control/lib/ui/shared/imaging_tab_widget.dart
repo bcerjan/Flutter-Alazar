@@ -1,5 +1,6 @@
 import 'package:alazar_control/repository/models/experiment.dart';
 import 'package:alazar_control/ui/experiment/bloc/experiment_bloc.dart';
+import 'package:alazar_control/ui/shared/alazar_response_widget.dart';
 import 'package:alazar_control/ui/shared/data_autosave.dart';
 import 'package:alazar_control/ui/shared/function_column.dart';
 import 'package:alazar_control/ui/shared/start_stop_button.dart';
@@ -206,6 +207,7 @@ class ImagingTabWidget<T extends ExperimentImaging> extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               DataAutosave(),
+              AlazarResponseWidget(),
               StartStopButton(),
             ],
           )),

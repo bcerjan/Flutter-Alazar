@@ -90,6 +90,9 @@ class ExperimentStateMapper extends ClassMapperBase<ExperimentState> {
   static List<int>? _$imageData(ExperimentState v) => v.imageData;
   static const Field<ExperimentState, List<int>> _f$imageData =
       Field('imageData', _$imageData, mode: FieldMode.member);
+  static Stream<AlazarResponse>? _$stream(ExperimentState v) => v.stream;
+  static const Field<ExperimentState, Stream<AlazarResponse>> _f$stream =
+      Field('stream', _$stream, mode: FieldMode.member);
 
   @override
   final MappableFields<ExperimentState> fields = const {
@@ -98,6 +101,7 @@ class ExperimentStateMapper extends ClassMapperBase<ExperimentState> {
     #cache: _f$cache,
     #errorText: _f$errorText,
     #imageData: _f$imageData,
+    #stream: _f$stream,
   };
 
   static ExperimentState _instantiate(DecodingData data) {

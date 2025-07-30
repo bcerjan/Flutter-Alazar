@@ -14,4 +14,23 @@ enum ChannelRange {
 
   const ChannelRange(this.label);
   final String label;
+
+  int toRust() {
+    switch (this) {
+      case ChannelRange.mv20:
+        return 1;
+      case ChannelRange.mv200:
+        return 6;
+      case ChannelRange.mv400:
+        return 7;
+      case ChannelRange.mv500:
+        return 8;
+      case ChannelRange.v1:
+        return 10;
+      case ChannelRange.v2:
+        return 11;
+      case ChannelRange.v5:
+        return 13;
+    }
+  }
 }

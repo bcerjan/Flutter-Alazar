@@ -27,6 +27,8 @@ class BoardTypeMapper extends EnumMapper<BoardType> {
     switch (value) {
       case 'c9440':
         return BoardType.c9440;
+      case 'c9462':
+        return BoardType.c9462;
       case 'c9350':
         return BoardType.c9350;
       default:
@@ -39,6 +41,8 @@ class BoardTypeMapper extends EnumMapper<BoardType> {
     switch (self) {
       case BoardType.c9440:
         return 'c9440';
+      case BoardType.c9462:
+        return 'c9462';
       case BoardType.c9350:
         return 'c9350';
     }

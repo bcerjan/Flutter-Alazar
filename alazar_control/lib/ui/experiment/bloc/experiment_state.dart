@@ -11,23 +11,26 @@ class ExperimentState with ExperimentStateMappable {
     this.cache = const {},
     this.errorText,
     this.imageData,
+    this.stream,
   });
 
   /// Use this constructor for serialization as we don't want to save the live
-  /// image data (if any)
+  /// image data (if any) or the stream handle
   @MappableConstructor()
   const ExperimentState.serialization({
     this.status = ExperimentStatus.idle,
     this.experiment = const ExperimentGalvoGalvo.getDefault(),
     this.cache = const {},
     this.errorText,
-  }) : imageData = const [];
+  })  : imageData = const [],
+        stream = null;
 
   final ExperimentStatus status;
   final Experiment experiment;
   final Map<AllExperimentsEnum, Experiment> cache;
   final String? errorText;
   final List<int>? imageData;
+  final Stream<AlazarResponse>? stream;
 
   ExperimentState store(Experiment exp) {
     final Map<AllExperimentsEnum, Experiment> newCache = Map.from(cache);
@@ -39,6 +42,17 @@ class ExperimentState with ExperimentStateMappable {
 
   Experiment? retrieve(AllExperimentsEnum type) {
     return cache[type];
+  }
+
+  ExperimentState addStream({required Stream<AlazarResponse> stream}) {
+    return ExperimentState(
+      status: status,
+      experiment: experiment,
+      cache: cache,
+      errorText: errorText,
+      imageData: imageData,
+      stream: stream,
+    );
   }
 
   bool isValid() {

@@ -72,4 +72,8 @@ class AlazarSettings with AlazarSettingsMappable {
     }
     return ret;
   }
+
+  int getBytesPerBuffer() {
+    return samplesPerRecord * 2; // hardcoded to 2 bytes per buffer for now
+  }
 }

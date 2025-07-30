@@ -46,7 +46,7 @@ class AlazarControlApp extends StatelessWidget {
       child: BlocProvider(
         create: (context) =>
             ExperimentBloc(repository: context.read<ExperimentRepository>())
-              ..add(ExperimentDetectBoards()),
+              ..add(ExperimentDetectBoardsEvent()),
         child:
             const MaterialApp(title: 'Alazar Control', home: ExperimentPage()),
       ),
