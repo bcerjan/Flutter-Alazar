@@ -1,14 +1,14 @@
 use crate::api::configure_board::RustAlazarSettings;
 use crate::frb_generated::{RustAutoOpaque, StreamSink};
-use flutter_rust_bridge::frb;
 use crate::{
     AlazarBoardsInSystemBySystemID, AlazarGetBoardBySystemID, AlazarGetBoardKind,
-    AlazarGetChannelInfo, AlazarGetParameter, BoardTypes, BoardTypes_ATS9350, BoardTypes_ATS9440,
-    ALAZAR_COUPLINGS, ALAZAR_COUPLINGS_AC_COUPLING, ALAZAR_IMPEDANCES,
+    AlazarGetChannelInfo, AlazarGetParameter, AlazarGetParameterUL, BoardTypes, BoardTypes_ATS9350,
+    BoardTypes_ATS9440, ALAZAR_COUPLINGS, ALAZAR_COUPLINGS_AC_COUPLING, ALAZAR_IMPEDANCES,
     ALAZAR_IMPEDANCES_IMPEDANCE_50_OHM, ALAZAR_INPUT_RANGES,
     ALAZAR_INPUT_RANGES_INPUT_RANGE_PM_200_MV, ALAZAR_PARAMETERS_GET_CHANNELS_PER_BOARD,
 };
 use anyhow::Result;
+use flutter_rust_bridge::frb;
 // use core::num;
 // use std::sync::mpsc::channel;
 use std::{ptr, thread::sleep, time::Duration};
@@ -98,10 +98,10 @@ pub async fn detect_boards_rust() -> Vec<RustBoard> {
     unsafe {
         let systemID = 1;
         let numBoards = AlazarBoardsInSystemBySystemID(systemID); // assume 1 system
-        for boardID in 1..numBoards {
+        for boardID in 0..numBoards {
             let h = AlazarGetBoardBySystemID(systemID, boardID);
             let kind: BoardTypes = AlazarGetBoardKind(h);
-            let numChannels: *mut i32 = std::ptr::null_mut();
+            let numChannels: *mut std::os::raw::c_ulong = std::ptr::null_mut();
             let cardType;
             let mut channelVec = Vec::new();
             match kind {
@@ -109,16 +109,16 @@ pub async fn detect_boards_rust() -> Vec<RustBoard> {
                 BoardTypes_ATS9350 => cardType = RustCardType::c9350,
                 _ => return vec, // don't know what board type we have
             }
-            AlazarGetParameter(
+            AlazarGetParameterUL(
                 h,
                 0,
                 ALAZAR_PARAMETERS_GET_CHANNELS_PER_BOARD.try_into().unwrap(),
                 numChannels,
             );
 
-            for j in 1..*numChannels {
+            for j in 0..*numChannels {
                 channelVec.push(RustChannel {
-                    index: j,
+                    index: j.try_into().unwrap(),
                     enabled: false,
                     coupling: ALAZAR_COUPLINGS_AC_COUPLING,
                     termination: ALAZAR_IMPEDANCES_IMPEDANCE_50_OHM,
@@ -183,7 +183,6 @@ pub fn startAcquisition(
     //         imageData: vec![0, 0],
     //     }),
     // }
-    
 
     free_alazar_buffers(buffers);
 
